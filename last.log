@@ -1,0 +1,50 @@
++ test -n ticker-10134
++ Q=/home/weaves/q/l32/q
++ : /misc/build/0/ticker-planto
++ cd /misc/build/0/ticker-planto
++ case $1 in
++ f tickerplant 'ticker.q -p 5010'
++ test -f 'ticker.q -p 5010'
++ echo 'fail: ticker.q -p 5010'
+fail: ticker.q -p 5010
++ return 1
++ screen -S ticker-10134 -X eval 'screen 0'
++ screen -S ticker-10134 -X eval 'title tickerplant'
++ screen -S ticker-10134 -X stuff ' rlwrap /home/weaves/q/l32/q ticker.q -p 5010\n'
++ sleep 0.25
++ w 5010
+++ seq 1 20
++ for i in `seq 1 20`
+++ netstat -lnt -A inet
+++ grep :5010
++ S='tcp        0      0 0.0.0.0:5010            0.0.0.0:*               LISTEN     '
++ '[' -n 'tcp        0      0 0.0.0.0:5010            0.0.0.0:*               LISTEN     ' ']'
++ return 0
++ test -n ticker-10134
++ Q=/home/weaves/q/l32/q
++ : /misc/build/0/ticker-planto
++ cd /misc/build/0/ticker-planto
++ case $1 in
++ f feed '/misc/build/0/ticker-planto/feed.q localhost:5010 -t 507'
++ test -f '/misc/build/0/ticker-planto/feed.q localhost:5010 -t 507'
++ echo 'fail: /misc/build/0/ticker-planto/feed.q localhost:5010 -t 507'
+fail: /misc/build/0/ticker-planto/feed.q localhost:5010 -t 507
++ return 1
++ screen -S ticker-10134 -X eval 'screen 1'
++ screen -S ticker-10134 -X eval 'title feed'
++ screen -S ticker-10134 -X stuff ' rlwrap /home/weaves/q/l32/q /misc/build/0/ticker-planto/feed.q localhost:5010 -t 507\n'
++ sleep 0.25
++ test -n ticker-10134
++ Q=/home/weaves/q/l32/q
++ : /misc/build/0/ticker-planto
++ cd /misc/build/0/ticker-planto
++ case $1 in
++ f last '/misc/build/0/ticker-planto/cx.q last -p 5015 -t 1000'
++ test -f '/misc/build/0/ticker-planto/cx.q last -p 5015 -t 1000'
++ echo 'fail: /misc/build/0/ticker-planto/cx.q last -p 5015 -t 1000'
+fail: /misc/build/0/ticker-planto/cx.q last -p 5015 -t 1000
++ return 1
++ screen -S ticker-10134 -X eval 'screen 2'
++ screen -S ticker-10134 -X eval 'title last'
++ screen -S ticker-10134 -X stuff ' rlwrap /home/weaves/q/l32/q /misc/build/0/ticker-planto/cx.q last -p 5015 -t 1000\n'
++ sleep 0.25
