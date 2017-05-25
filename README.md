@@ -82,10 +82,31 @@ feedm, which calls .u.updm on the ticker plant.)
 After that, it begins to replay in real-time, using feed, assigned to
 synchronous method .z.ts, and the .u.upd method.
 
+* Examples
+
+** ticker, feed and last
+
+There is a log-file of a run of 
+
+ $ run.sh ticker last feed
+
+There is an image of couple of updates.
 
 * Postamble
 
-This file's Emacs file variables
+** New to q/kdb+?
+
+I'd recommend the kx website and the excellent tutorials. This ticker plant
+isn't a very good test-bed for learning q/kdb+.
+
+** Ticker plants in operation
+
+The q/kdb+ ticker plant is much more evolved. And it's key parts are
+usually implemented in 'k', the programming language that q is derived
+from.
+
+
+** This file's Emacs file variables
 
 [  Local Variables: ]
 [  mode:text ]
