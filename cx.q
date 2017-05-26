@@ -18,9 +18,12 @@ if[x~"hlcv";
  upd:{[t;x]hlcv::select max high,min low,last price,sum size by sym
   from(0!hlcv),select sym,high:price,low:price,price,size from x}]
 
-/ last
+/ last - needs work. Doesn't show prices if any are null.
+/ Or the ticker plant needs to be filtered.
+.t.x:()
+.t.n:`
 if[x~"last";
- upd:{[t;x] 0N!t; .[t;();,;select by sym from x] } ]
+ upd:{[t;x] $[null .t.x:x; .[t;();,;select by sym from x] } ]
 
 / show only - runs on the timer.
 if[x~"show";
