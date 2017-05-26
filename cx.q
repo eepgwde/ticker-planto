@@ -20,9 +20,9 @@ if[x~"hlcv";
 
 / last
 if[x~"last";
- upd:{[t;x].[t;();,;select by sym from x]}]
+ upd:{[t;x] 0N!t; .[t;();,;select by sym from x] } ]
 
-/ show only
+/ show only - runs on the timer.
 if[x~"show";
  tabcount:()!();
  / count the incoming updates
@@ -45,3 +45,12 @@ if[x~"vwap";t:`trade;
  upds:{[t;x]vwap+:select size wsum price,sum size by sym from x;show x}]
 
 {h(".u.sub";x;s)} each t;
+
+/  Local Variables: 
+/  mode:q 
+/  q-prog-args: "-p 5010"
+/  fill-column: 75
+/  comment-column:50
+/  comment-start: "/  "
+/  comment-end: ""
+/  End:

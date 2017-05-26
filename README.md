@@ -24,13 +24,15 @@ to its clients, or subscribers, these are (r.q and cx.q instances). It
 receives ticks from a feed (this demo uses feed.q.)
 
 The ticker-plant interoperates with a special client, the real-time
-database, the r.q instance.
+database, the r.q instance. This is *not* in this demo. The rdb is
+implemented using cx.q - the generic client with a number of methods -
+vwap, last and others. rdb is one of those.
 
 * Installation and Running
 
 ** Installation: top level source directory - no build
 
-You'll need the q interpreter in the ~/q directory. (Links work for me.)
+You'll need the q interpreter in the ~/q directory. (Soft links work for me.)
 
 ** Running
 
@@ -91,6 +93,31 @@ There is a log-file of a run of
  $ run.sh ticker last feed
 
 There is an image of couple of updates.
+
+* Usefulness
+
+The terms of the licence for the use of the 32 bit free download are such
+that you can't use this implementation in commercial use.
+
+** Developing clients
+
+If you want to develop clients this will work well enough.
+
+** Coding in q
+
+q/kdb+ systems are tailored for their environment.
+
+ - Much use is made of the host OS to do scheduling and file system
+   management, so no need to learn large APIs. 
+
+ - There are no configuration files that adapt your process's application
+   to the environment. So you don't usually start up in debug mode and load
+   special functions. You write three of so variants of a function and use
+   the text editor to define one.
+
+ - Only do expensive application logic coding in the startup.
+
+ - There is no debugger to speak of. 
 
 * Postamble
 

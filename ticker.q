@@ -8,8 +8,10 @@
 // This is a simple example of a tickerplant (all coded in q).
 
 // Schema for published tables.
-quote:flip `time`sym`bid`ask`bsize`asize`mode`ex!()
-trade:flip `time`sym`price`size`stop`cond`ex!()
+\l sym.q
+
+/ quote:flip `time`sym`bid`ask`bsize`asize`mode`ex!()
+/ trade:flip `time`sym`price`size`stop`cond`ex!()
 
 // client subscription handler.
 //
@@ -85,6 +87,11 @@ pub1:{[t;s;h]
 	 t insert x;
 	 pub t;
 	 delete from t }
+
+// Try publishing.
+.u.upd1:{[t;x]
+	 t insert x;
+	 pub t; }
 
 /  Local Variables: 
 /  mode:q 
