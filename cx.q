@@ -21,9 +21,10 @@ if[x~"hlcv";
 / last - needs work. Doesn't show prices if any are null.
 / Or the ticker plant needs to be filtered.
 .t.x:()
-.t.n:`
 if[x~"last";
- upd:{[t;x] $[null .t.x:x; .[t;();,;select by sym from x] } ]
+   upd:{[t;x]
+	if [ 0 = count .t.x; .t.x:x ];
+	.[t;();,;select by sym from x] } ]
 
 / show only - runs on the timer.
 if[x~"show";
@@ -51,7 +52,7 @@ if[x~"vwap";t:`trade;
 
 /  Local Variables: 
 /  mode:q 
-/  q-prog-args: "-p 5010"
+/  q-prog-args: "last -p 5015 -t 1000"
 /  fill-column: 75
 /  comment-column:50
 /  comment-start: "/  "

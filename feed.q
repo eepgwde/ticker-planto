@@ -1,16 +1,6 @@
 // generate data for rdb demo
 
-sn:2 cut (
- `AMD;"ADVANCED MICRO DEVICES";
- `AIG;"AMERICAN INTL GROUP INC";
- `AAPL;"APPLE INC COM STK";
- `DELL;"DELL INC";
- `DOW;"DOW CHEMICAL CO";
- `GOOG;"GOOGLE INC CLASS A";
- `HPQ;"HEWLETT-PACKARD CO";
- `INTC;"INTEL CORP";
- `IBM;"INTL BUSINESS MACHINES CORP";
- `MSFT;"MICROSOFT CORP")
+sn:2 cut (`AMD;"ADVANCED MICRO DEVICES"; `AIG;"AMERICAN INTL GROUP INC"; `AAPL;"APPLE INC COM STK"; `DELL;"DELL INC"; `DOW;"DOW CHEMICAL CO"; `GOOG;"GOOGLE INC CLASS A"; `HPQ;"HEWLETT-PACKARD CO"; `INTC;"INTEL CORP"; `IBM;"INTL BUSINESS MACHINES CORP"; `MSFT;"MICROSOFT CORP")
 
 s:first each sn
 n:last each sn
@@ -19,7 +9,20 @@ m:" ABHILNORYZ" / mode
 c:" 89ABCEGJKLNOPRTWZ" / cond
 e:"NONNONONNN" / ex
 
+/
+mode - might be the BBO conditions
+ex - is exchange, New York and Other
+c - conditions but I don't recognise 8 or 9.
+\
+
 // init.q
+
+// cnt - the number of stocks
+// pi
+// gen - looks like a drift
+// normalrand - Box-Muller Normal RV
+// randomize - set the random seed to a function of the time.
+// rnd - is a round to a bip (1/100th of a 1%) is 0.025 is 0.03
 
 cnt:count s
 pi:acos -1
@@ -29,22 +32,35 @@ randomize:{value "\\S ",string "i"$0.8*.z.p%1000000000}
 rnd:{0.01*floor 0.5+x*100}
 vol:{10+`int$x?90}
 
+// Reproducible using a fixed seed.
 // randomize[]
 \S 235721
 
 // =========================================================
 // generate a batch of prices
 // qx index, qb/qa margins, qp price, qn position
+//
+// n is a set of indicators for the qx stock indicators.
+// qx=/:til cnt returns indicators, 1 if stock is in qx
+// 
+// qp raze n - removes any nulls
+//
+// t[] uses an 'n' but it isn't clear what it is.
+//
+// There is a problem with this. p begins as the initial prices and is
+// overwritten each time batch is called, but batch can introduce nulls.
+// And, eventually, all the prices are assigned null and stay that way.
+// 
 batch:{
  d:gen x;
  qx::x?cnt;
  qb::rnd x?1.0;
  qa::rnd x?1.0;
- n:where each qx=/:til cnt;
- s:p*prds each d n;
+ n0::where each qx=/:til cnt;
+ s0:p*prds each d n0;
  qp::x#0.0;
- (qp raze n):rnd raze s;
- p::last each s;
+ (qp raze n0):rnd raze s0;
+ p::last each s0;
  qn::0}
 // gen feed for ticker plant
 
@@ -57,8 +73,8 @@ qpt:5   / avg quotes per trade
 // =========================================================
 t:{
  if[not (qn+x)<count qx;batch len];
- i:qx n:qn+til x;qn+:x;
- (s i;qp n;`int$x?99;1=x?20;x?c;e i)}
+ i:qx n0:qn+til x;qn+:x;
+ (s i;qp n0;`int$x?99;1=x?20;x?c;e i)}
 
 q:{
  if[not (qn+x)<count qx;batch len];
