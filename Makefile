@@ -2,7 +2,7 @@
 # GNUMakefile
 
 export D_NAME ?= run
-export D_Ss ?= ticker rdb show feed
+export D_Ss ?= ticker rdb last show feed
 
 check: $(D_NAME).log
 

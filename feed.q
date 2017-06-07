@@ -5,6 +5,7 @@ sn:2 cut (`AMD;"ADVANCED MICRO DEVICES"; `AIG;"AMERICAN INTL GROUP INC"; `AAPL;"
 s:first each sn
 n:last each sn
 p:33 27 84 12 20 72 36 51 42 29 / price
+p0:p
 m:" ABHILNORYZ" / mode
 c:" 89ABCEGJKLNOPRTWZ" / cond
 e:"NONNONONNN" / ex
@@ -38,10 +39,21 @@ vol:{10+`int$x?90}
 
 // =========================================================
 // generate a batch of prices
-// qx index, qb/qa margins, qp price, qn position
+// qx index, qb/qa margins, qp price, qn position.
+// 
+// Makes use of alias ::
 //
-// n is a set of indicators for the qx stock indicators.
-// qx=/:til cnt returns indicators, 1 if stock is in qx
+// d is a set of deltas.
+//
+// n0 is a set of indicators for which deltas to use 
+// qx=/:til cnt returns indicators, 1 if the index is in qx. So for
+// qx === 3 2 3 9 8 5 8 6 1 1
+// n0 === null, 8 9, 1, 0 2, null , 5 , 7, null, 4 6, 3
+// ie. no zeroes appear in qx, so the delta at position 0 is not selected.
+// because 1 1 in qx at positions 8 and 9, then then deltas at positions 8 and 9 are chosen
+// because 2 in qx at position 1, then the delta at pos 1 is chosen.
+//
+// d n0 is shorthand for d[n0]
 // 
 // qp raze n - removes any nulls
 //
@@ -52,16 +64,20 @@ vol:{10+`int$x?90}
 // And, eventually, all the prices are assigned null and stay that way.
 // 
 batch:{
- d:gen x;
- qx::x?cnt;
- qb::rnd x?1.0;
- qa::rnd x?1.0;
- n0::where each qx=/:til cnt;
- s0:p*prds each d n0;
- qp::x#0.0;
- (qp raze n0):rnd raze s0;
- p::last each s0;
- qn::0}
+       d:gen x;
+       qx::x?cnt;
+       qb::rnd x?1.0;
+       qa::rnd x?1.0;
+       n0:where each qx=/:til cnt;
+       s0::p*prds each d n0;
+       qp::x#0.0;
+       // This adjusts bid and asks.
+       (qp raze n0):rnd raze s0;
+       p1:p;
+       p2:last each s0;
+       pX:raze rnd 1_fills (p1; p2);
+       p::pX;
+       qn::0}
 // gen feed for ticker plant
 
 len:10
@@ -69,6 +85,8 @@ batch len
 
 maxn:15 / max trades per tick
 qpt:5   / avg quotes per trade
+
+\
 
 // =========================================================
 t:{
