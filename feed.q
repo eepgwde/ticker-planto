@@ -4,7 +4,7 @@ sn:2 cut (`AMD;"ADVANCED MICRO DEVICES"; `AIG;"AMERICAN INTL GROUP INC"; `AAPL;"
 
 s:first each sn
 n:last each sn
-p:33 27 84 12 20 72 36 51 42 29 / price
+p:9h$33 27 84 12 20 72 36 51 42 29 / price
 p0:p
 m:" ABHILNORYZ" / mode
 c:" 89ABCEGJKLNOPRTWZ" / cond
@@ -45,7 +45,8 @@ vol:{10+`int$x?90}
 //
 // d is a set of deltas.
 //
-// n0 is a set of indicators for which deltas to use 
+// n0 is a set of indicators for which deltas to use
+// qx is a clever index randomize
 // qx=/:til cnt returns indicators, 1 if the index is in qx. So for
 // qx === 3 2 3 9 8 5 8 6 1 1
 // n0 === null, 8 9, 1, 0 2, null , 5 , 7, null, 4 6, 3
@@ -69,14 +70,15 @@ batch:{
        qb::rnd x?1.0;
        qa::rnd x?1.0;
        n0:where each qx=/:til cnt;
-       s0::p*prds each d n0;
+       s0:p*prds each d n0;
        qp::x#0.0;
        // This adjusts bid and asks.
        (qp raze n0):rnd raze s0;
-       p1:p;
-       p2:last each s0;
-       pX:raze rnd 1_fills (p1; p2);
-       p::pX;
+       // New prices to update are:
+       p2::rnd last each s0;
+       i0: where not null p2;
+       // Update global prices
+       p[i0]:(type p)$p2 i0;
        qn::0}
 // gen feed for ticker plant
 
@@ -86,18 +88,16 @@ batch len
 maxn:15 / max trades per tick
 qpt:5   / avg quotes per trade
 
-\
-
 // =========================================================
 t:{
  if[not (qn+x)<count qx;batch len];
- i:qx n0:qn+til x;qn+:x;
- (s i;qp n0;`int$x?99;1=x?20;x?c;e i)}
+ i:qx qn+til x;qn+:x;
+ (s i;p2 i;`int$x?99;1=x?20;x?c;e i)}
 
 q:{
  if[not (qn+x)<count qx;batch len];
- i:qx n:qn+til x;p:qp n;qn+:x;
- (s i;p-qb n;p+qa n;vol x;vol x;x?m;e i)}
+ i:qx qn+til x; qn+:x;
+ (s i;p2[i]-qb[i];p2[i]+qa[i];vol x;vol x;x?m;e i)}
 
 feed:{h$[rand 2;
  (".u.upd";`trade;t 1+rand maxn);
@@ -125,7 +125,7 @@ init0:{ [len;n]
 /// init: init0[10]
 init: init0[;5]
 
-// Test by viewing
+// Test the times by viewing
 // feedm: { 0N!.Q.s1 x }
 // init[10]
 
