@@ -12,7 +12,7 @@ $(D_NAME).log:
 clean:
 	m_ -f ticker screen x-kill-all
 
-dist-clean: clean
+distclean: clean
 	$(RM) $(wildcard *.log)
 
 
