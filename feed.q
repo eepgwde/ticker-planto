@@ -91,13 +91,15 @@ qpt:5   / avg quotes per trade
 // =========================================================
 t:{
  if[not (qn+x)<count qx;batch len];
- i:qx qn+til x;qn+:x;
- (s i;p2 i;`int$x?99;1=x?20;x?c;e i)}
+   i:qx qn+til x;qn+:x;
+   i: i where not null s i;
+   (s i;p2 i;`int$x?99;1=x?20;x?c;e i)}
 
 q:{
  if[not (qn+x)<count qx;batch len];
- i:qx qn+til x; qn+:x;
- (s i;p2[i]-qb[i];p2[i]+qa[i];vol x;vol x;x?m;e i)}
+   i:qx qn+til x; qn+:x;
+   i: i where not null s i;
+   (s i;p2[i]-qb[i];p2[i]+qa[i];vol x;vol x;x?m;e i)}
 
 feed:{h$[rand 2;
  (".u.upd";`trade;t 1+rand maxn);
@@ -115,8 +117,6 @@ feedm:{h$[rand 2;
 /// Randomly generate 'len' timespans, take the last n.
 /// Submit.
 init0:{ [len;n]
-       / o:"t"$9e5*floor (.z.T-3600000)%9e5;
-
        o:`time$.z.T - `timespan$60*60*1000*1000*1000;
        d:`timespan$.z.T-o;
        len: $[null len; floor d%113; len];

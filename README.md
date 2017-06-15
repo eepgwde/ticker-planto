@@ -84,6 +84,11 @@ feedm, which calls .u.updm on the ticker plant.)
 After that, it begins to replay in real-time, using feed, assigned to
 synchronous method .z.ts, and the .u.upd method.
 
+** feed.q - price generation
+
+I had to pick apart the price generation logic and implement my own.
+feed0.q is a simple script for debugging.
+
 * Examples
 
 ** ticker, feed and last
@@ -128,9 +133,9 @@ isn't a very good test-bed for learning q/kdb+.
 
 ** Ticker plants in operation
 
-The q/kdb+ ticker plant is much more evolved. And its key parts are
-usually implemented in 'k', the programming language that q is derived
-from.
+The production kx q/kdb+ ticker plant is much more evolved. And its key
+parts are usually implemented in 'k' (the programming language that q is
+derived from.)
 
 
 ** This file's Emacs file variables
