@@ -95,11 +95,15 @@ t:{
    i: i where not null s i;
    (s i;p2 i;`int$x?99;1=x?20;x?c;e i)}
 
+// see feed0.q
+// split bid from quote and randomly choose a subset.
 q:{
  if[not (qn+x)<count qx;batch len];
    i:qx qn+til x; qn+:x;
    i: i where not null s i;
-   (s i;p2[i]-qb[i];p2[i]+qa[i];vol x;vol x;x?m;e i)}
+   ba: (flip (s i;p2[i]-qb[i];9h$(count i)#0N;vol (count i);7h$(count i)#0N;(count i)?m;e i)),flip (s i;9h$(count i)#0N;p2[i]+qa[i];7h$(count i)#0N;vol (count i);(count i)?m;e i);
+   n0: count ba;
+   flip ba (count i)?n0 }
 
 feed:{h$[rand 2;
  (".u.upd";`trade;t 1+rand maxn);
@@ -128,6 +132,9 @@ init: init0[;5]
 // Test the times by viewing
 // feedm: { 0N!.Q.s1 x }
 // init[10]
+
+// \
+// weaves: disable here for debug
 
 /// Connect and send
    

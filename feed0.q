@@ -65,3 +65,16 @@ qn+:x
 // 
 (s i;p2 i;`int$x?99;1=x?20;x?c;e i)
 
+
+// Split bids and asks.
+
+if[not (qn+x)<count qx;batch len];
+i:qx qn+til x
+qn+:x
+i: i where not null s i
+
+(s i;p2[i]-qb[i];p2[i]+qa[i];vol x;vol x;x?m;e i)
+
+ba: (flip (s i;p2[i]-qb[i];9h$(count i)#0N;vol x;7h$(count i)#0N;x?m;e i)),flip (s i;9h$(count i)#0N;p2[i]+qa[i];7h$(count i)#0N;vol x;x?m;e i)
+n0: count ba
+flip ba (count i)?n0
