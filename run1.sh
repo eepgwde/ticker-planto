@@ -38,12 +38,14 @@ set -e
 
 case $1 in 
  "ticker" ) f "tickerplant" "ticker.q" "-p 5010";w 5010 ;;
- "rdbr" ) f $1 "$D/r.q" "-p 5011 -t 1000" ;;
+ "feed" ) f $1 "$D/feed.q" "localhost:5010 -t 507" ;;
+ # Real rdb
+ # "rdbr" ) f $1 "$D/r.q" "-p 5011 -t 1000" ;;
  "rdb" ) f $1 "$D/cx.q" $1 "-p 5011 -t 1000" ;;
  "hlcv" ) f $1 "$D/cx.q" "$1 -p 5014 -t 1000" ;;
  "last" ) f $1 "$D/cx.q" "$1 -p 5015 -t 1000" ;;
  "tq" ) f $1 "$D/cx.q" "$1 -p 5016 -t 1000" ;;
  "vwap" ) f $1 "$D/cx.q" "$1 -p 5017 -t 1000" ;;
  "show" ) f $1 "$D/cx.q" $1 ;;
- "feed" ) f $1 "$D/feed.q" "localhost:5010 -t 507" ;;
+ "gtrd") f $1 "$D/gtrd.q" "-p 5018 -t 1000" ;;
 esac

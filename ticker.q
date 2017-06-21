@@ -19,7 +19,7 @@
 // Maintain a dictionary against a list of [symbols;tables;handle]
 // client sends (name;symbols;tables)
 Sub:`quote`trade!()
-.u.sub:{Sub[x],:enlist x,y,neg .z.w}
+.u.sub:{Sub[x],:enlist x,enlist y,neg .z.w}
 
 // local: publish to all subscribers for their tables and symbols.
 pub:{{.[pub1;x]} each Sub x}
