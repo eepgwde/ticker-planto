@@ -17,19 +17,27 @@
 // client subscription handler.
 //
 // Maintain a dictionary against a list of [symbols;tables;handle]
-// client sends (name;symbols;tables)
+// client sends (table;sym-list) for each table
+// This forms a tuple (sym-list; file-handle)
 Sub:`quote`trade!()
-.u.sub:{Sub[x],:enlist x,y,neg .z.w}
+.u.sub:{ Sub[x],: enlist (enlist raze y),neg .z.w }
 
 // local: publish to all subscribers for their tables and symbols.
-pub:{{.[pub1;x]} each Sub x}
+// passing the name of the table to pub1.
+pub:{{.[pub1;(x;y)]}[x;] each Sub x}
 
 // Distributor - callback the method on the client is upd[t;symbols]
 // special symbol is ` - send the whole table.
-pub1:{[t;s;h]
- sel:$[s~`;value t;select from t where sym in s];
- if[count sel;@[h;("upd";t;sel);()]]}
 
+/ trace version.
+pub1:{[t;b] 0N!t; s:raze b[0]; 0N!.Q.s1 s; h:b[1]; 0N!.Q.s1 h; }
+
+/ switch off
+pub1: {[t;b] }
+
+pub1:{[t;b] s:raze b[0]; h:b[1]; 
+      sel:$[any ` = raze s;value t;select from t where sym in s]; 
+      if[count sel;@[h;("upd";t;sel);()]] }
 
 // Feed handler
 // A real ticker-plant would receive from C runtime components.

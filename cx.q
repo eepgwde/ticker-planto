@@ -2,8 +2,13 @@
 / example clients
 
 x:.z.x 0                  / client type
+
 s:`;                   	  / default all symbols
 d:`GOOG`IBM`MSFT          / symbol selection
+
+// Switch to the sub-set if something else on the command-line.
+if[ count .z.x 1; s:d]
+
 t:`trade`quote            / default tables
 h:hopen `::5010           / connect to tickerplant
 
@@ -18,10 +23,10 @@ if[x~"hlcv";
  upd:{[t;x]hlcv::select max high,min low,last price,sum size by sym
   from(0!hlcv),select sym,high:price,low:price,price,size from x}]
 
-/ last - needs work. Doesn't show prices if any are null.
-/ Or the ticker plant needs to be filtered.
+/ last
+/ If last appears as first part of string
 .t.x:()
-if[x~"last";
+if[any 0 = x ss "last";
    upd:{[t;x]
 	if [ 0 = count .t.x; .t.x:x ];
 	.[t;();,;select by sym from x] } ]
@@ -52,7 +57,7 @@ if[x~"vwap";t:`trade;
 
 /  Local Variables: 
 /  mode:q 
-/  q-prog-args: "last -p 5016 -t 1000"
+/  q-prog-args: "last d -p 5016 -t 1000"
 /  fill-column: 75
 /  comment-column:50
 /  comment-start: "/  "
