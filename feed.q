@@ -89,21 +89,26 @@ maxn:15 / max trades per tick
 qpt:5   / avg quotes per trade
 
 // =========================================================
+
+// Generate a set of trades.
+//
+// A useful test is: flip t 10
+// If it doesn't flip, the field count, n, may be wrong.
 t:{
  if[not (qn+x)<count qx;batch len];
    i:qx qn+til x;qn+:x;
-   i: i where not null s i;
-   (s i;p2 i;`int$x?99;1=x?20;x?c;e i)}
+   i: i where not null s i; n:count s i;
+   (s i;p2 i;`int$n?99;1=n?20;n?c;e i)}
 
 // see feed0.q
 // split bid from quote and randomly choose a subset.
 q:{
  if[not (qn+x)<count qx;batch len];
    i:qx qn+til x; qn+:x;
-   i: i where not null s i;
-   ba: (flip (s i;p2[i]-qb[i];9h$(count i)#0N;vol (count i);7h$(count i)#0N;(count i)?m;e i)),flip (s i;9h$(count i)#0N;p2[i]+qa[i];7h$(count i)#0N;vol (count i);(count i)?m;e i);
+   i: i where not null s i; n:count s i;
+   ba: (flip (s i;p2[i]-qb[i];9h$n#0N;vol n;7h$n#0N;n?m;e i)),flip (s i;9h$n#0N;p2[i]+qa[i];7h$n#0N;vol n;n?m;e i);
    n0: count ba;
-   flip ba (count i)?n0 }
+   flip ba n?n0 }
 
 feed:{h$[rand 2;
  (".u.upd";`trade;t 1+rand maxn);
@@ -133,8 +138,8 @@ init: init0[;5]
 // feedm: { 0N!.Q.s1 x }
 // init[10]
 
-// \
 // weaves: disable here for debug
+// \
 
 /// Connect and send
    
@@ -156,7 +161,7 @@ init[10]
 
 //  Local Variables: 
 //  mode:q 
-//  q-prog-args: "localhost:5010 -t 507"
+//  q-prog-args: "localhost:5010 -t 507 -halt"
 //  fill-column: 75
 //  comment-column:50
 //  comment-start: "/  "

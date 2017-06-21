@@ -2,7 +2,12 @@
 # GNUMakefile
 
 export D_NAME ?= run
-export D_Ss ?= ticker rdb last show feed
+
+# services
+# ticker rdb tq hlcv last show feed
+# export D_Ss ?= ticker rdb last show feed
+
+export D_Ss ?= rdb show feed
 
 check: $(D_NAME).log
 

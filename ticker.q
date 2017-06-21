@@ -74,25 +74,21 @@ pub1:{[t;s;h]
 
 /// Table and publishing
 
-// Try publishing.
-.u.upd1:{[t;x]
-	 t insert x;
-	 pub t; }
-
-// Over-ridden: no publish, no delete.
-.u.upd1:{[t;x]
-	 t insert x; }
-
-// Final.
+// Final
 .u.upd1:{[t;x]
 	 t insert x;
 	 pub t;
 	 delete from t }
 
-// Try publishing.
-.u.upd1:{[t;x]
-	 t insert x;
-	 pub t; }
+
+// To just trace the .u.upd1 operation, you change its definition you override in
+// the following file.
+
+.sys.qreloader enlist "u-upd1.q"
+
+\
+
+.sys.qreloader enlist "u-upd0.q"
 
 /  Local Variables: 
 /  mode:q 
