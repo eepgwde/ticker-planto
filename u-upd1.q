@@ -6,18 +6,17 @@
 // \
 
 .t.x:();
+.t.t:`;
 .t.n:0;
 
 // With trap, assign to a global and redefine the caller.
 .u.upd1:{[t;x]
 	 .t.n+:1;
-	 .t.t:t;
-	 .t.x:x;
 	 v0:@[ t insert;x;`err];
 	 f0: -11h = type v0; // failed, print trace.
 	 if[f0; 0N!"error: ", string t];
-	 if[f0; { count y[x;] }[;x] each til count x];
-	 if[f0; .t.x:x; .u.upd1: {[t;x]}];
+	 if[f0; 0N!{ count y[x;] }[;x] each til count x];
+	 if[f0; .t.x:x; .t.t:t; .u.upd1: {[t;x]}];
 	 if[f0; : ::]; // return
 	 pub t; }
 

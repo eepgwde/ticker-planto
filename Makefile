@@ -7,7 +7,7 @@ export D_NAME ?= run
 # ticker rdb tq hlcv last show feed
 # export D_Ss ?= ticker rdb last show feed
 
-export D_Ss ?= rdb show feed
+export D_Ss ?= ticker rdb last tq show feed
 
 check: $(D_NAME).log
 

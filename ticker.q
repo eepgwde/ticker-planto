@@ -81,12 +81,13 @@ pub1:{[t;s;h]
 	 delete from t }
 
 
+\
+
 // To just trace the .u.upd1 operation, you change its definition you override in
-// the following file.
+// the following file. You can only load these with the qsys q invokers Qp or Qr.
+// (So only in emacs.)
 
 .sys.qreloader enlist "u-upd1.q"
-
-\
 
 .sys.qreloader enlist "u-upd0.q"
 

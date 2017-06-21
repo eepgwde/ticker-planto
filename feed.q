@@ -114,9 +114,10 @@ feed:{h$[rand 2;
  (".u.upd";`trade;t 1+rand maxn);
  (".u.upd";`quote;q 1+rand qpt*maxn)];}
 
-feedm:{h$[rand 2;
-	  (".u.updm";`trade;(enlist a#x),t a:1+rand maxn);
-	  (".u.updm";`quote;(enlist a#x),q a:1+rand qpt*maxn)];}
+feedm:{ sw:rand 2;
+       t0: $[sw; t 1+rand maxn; q 1+rand qpt*maxn];
+       a:count t0[0;];
+       h(".u.updm"; $[sw; `trade; `quote]; (enlist a#x),t0 ); }
 
 
 /// Initialize with some timestamped records
@@ -139,7 +140,6 @@ init: init0[;5]
 // init[10]
 
 // weaves: disable here for debug
-// \
 
 /// Connect and send
    
