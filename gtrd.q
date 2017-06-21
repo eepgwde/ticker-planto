@@ -39,14 +39,14 @@ h:hopen `::5010           / connect to tickerplant
 
 upd: { [t;x] }
 
-aa: `tid xdesc select from .t.a where sym in `AAPL
-ba: `tid xdesc select from .t.b where sym in `AAPL
+aa: `tid xdesc select from .t.a where sym in first d
+ba: `tid xdesc select from .t.b where sym in first d
 
 x0:aj[`sym`tid; ba; aa]
 
 x0:delete from x0 where (null ask) or (null bid)
 
-select from x0 where bid >= ask
+x0: select from x0 where bid >= ask
 
 /  Local Variables: 
 /  mode:q 

@@ -10,6 +10,10 @@ m:" ABHILNORYZ" / mode
 c:" 89ABCEGJKLNOPRTWZ" / cond
 e:"NONNONONNN" / ex
 
+// volatility 5% per annum 4 hours a day
+// allow for two sigma.
+v1: 2 * 0.05 % sqrt 4 * 250 
+
 /
 mode - might be the BBO conditions
 ex - is exchange, New York and Other
@@ -67,8 +71,8 @@ vol:{10+`int$x?90}
 batch:{
        d:gen x;
        qx::x?cnt;
-       qb::rnd x?1.0;
-       qa::rnd x?1.0;
+       qb::rnd x?v1; // uniform fluctuations at volatility
+       qa::rnd x?v1;  // uniform fluctuations at volatility
        n0:where each qx=/:til cnt;
        s0:p*prds each d n0;
        qp::x#0.0;
@@ -106,7 +110,7 @@ q:{
  if[not (qn+x)<count qx;batch len];
    i:qx qn+til x; qn+:x;
    i: i where not null s i; n:count s i;
-   ba: (flip (s i;p2[i]-qb[i];9h$n#0N;vol n;7h$n#0N;n?m;e i)),flip (s i;9h$n#0N;p2[i]+qa[i];7h$n#0N;vol n;n?m;e i);
+   ba: (flip (s i;p2[i]*1f-qb[i];9h$n#0N;vol n;7h$n#0N;n?m;e i)),flip (s i;9h$n#0N;p2[i]*1+qa[i];7h$n#0N;vol n;n?m;e i);
    n0: count ba;
    flip ba n?n0 }
 
@@ -140,7 +144,7 @@ init: init0[;5]
 // init[10]
 
 // weaves: disable here for debug
-
+// \
 /// Connect and send
    
 h:neg hopen `::5010
