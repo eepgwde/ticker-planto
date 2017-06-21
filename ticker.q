@@ -10,6 +10,7 @@
 // Schema for published tables.
 \l sym.q
 
+// Schema by hand.
 / quote:flip `time`sym`bid`ask`bsize`asize`mode`ex!()
 / trade:flip `time`sym`price`size`stop`cond`ex!()
 
