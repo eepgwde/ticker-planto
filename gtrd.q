@@ -39,8 +39,8 @@ h:hopen `::5010           / connect to tickerplant
 
 upd: { [t;x] }
 
-aa: `tid xdesc select from .t.a where sym in first d
-ba: `tid xdesc select from .t.b where sym in first d
+aa: `tid xasc select from .t.a where sym in first d
+ba: `tid xasc select from .t.b where sym in first d
 
 x0:aj[`sym`tid; ba; aa]
 
@@ -50,7 +50,7 @@ x0: select from x0 where bid >= ask
 
 /  Local Variables: 
 /  mode:q 
-/  q-prog-args: "-p 5018 -t 1000"
+/  q-prog-args: "-p 5019 -t 1000"
 /  fill-column: 75
 /  comment-column:50
 /  comment-start: "/  "
