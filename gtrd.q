@@ -27,13 +27,7 @@ t:`quote                   / default tables
 .t.idx:1
 .t.x:()
 
-upd1:{ [t;x]
-      x: update tid:.t.idx+i from x;
-      .t.idx:.t.idx + count x;
-      .t.x:x;
-      .t.a,:select by atid from delete bid, bsize from update atime:time, atid:tid from select from x where not null ask ; 
-      .t.b,:select by btid from delete ask, asize from update btime:time, btid:tid from select from x where not null bid ; 
-      : :: }
+.sys.qreloader enlist "gtrd1.q"
 
 upd: upd1
 
@@ -44,14 +38,21 @@ h:hopen `::5010           / connect to tickerplant
 
 upd: { [t;x] }
 
-aa: `tid xasc select from .t.a where sym in first d
-ba: `tid xasc select from .t.b where sym in first d
+aa: `tid xasc select from .t.a where sym in d
+ba: `tid xasc select from .t.b where sym in d
 
 x0:aj[`sym`tid; ba; aa]
 
 x0:delete from x0 where (null ask) or (null bid)
 
 x0: select from x0 where (bid >= ask),(btime >= atime)
+
+x0: value `sym`time`bid xasc x0
+
+b0: x0[0;]
+
+xb: ungroup select `.t.b$distinct btid by time,sym from x0
+xa: ungroup select `.t.a$distinct atid by time,sym from x0
 
 // Rules:
 // At bid time, find max bid, find all offers less than max bid, sum offered sizes
