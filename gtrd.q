@@ -12,12 +12,14 @@ s:`;                   	  / default all symbols
 d:`GOOG`IBM`MSFT          / symbol selection
 t:`quote                   / default tables
 
+.t.start: .z.n
+
 \l sym.q
 
 // Add a transaction id.
 
-.t.a: delete bid, bsize from update atime:time, tid:i, atid:i from quote;
-.t.b: delete ask, asize from update btime:time, tid:i, btid:i from quote;
+.t.a: delete bid, bsize from update id0:i, atime:time, tid:i, atid:i from quote;
+.t.b: delete ask, asize from update id0:i, btime:time, tid:i, btid:i from quote;
 
 .t.a: select by atid from .t.a;
 .t.b: select by btid from .t.b;
@@ -25,6 +27,7 @@ t:`quote                   / default tables
 .t.t:([] bid:`.t.a$(); ask:`.t.b$(); cond:`char$(); ex:`char$())
 
 .t.idx:1
+.t.id0: 1
 .t.x:()
 
 .sys.qreloader enlist "gtrd1.q"
