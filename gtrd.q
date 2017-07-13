@@ -10,6 +10,7 @@
 x:.z.x 0                  / client type
 s:`;                   	  / default all symbols
 d:`GOOG`IBM`MSFT          / symbol selection
+d:s
 t:`quote                   / default tables
 
 .t.start: .z.n
@@ -31,6 +32,8 @@ t:`quote                   / default tables
 .t.x:()
 
 .sys.qreloader enlist "gtrd1.q"
+
+.z.ts: syn0
 
 upd: upd1
 

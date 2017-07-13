@@ -1,0 +1,84 @@
+*
+
+* Source: CMEGroup NASDAQ
+
+https://www.cmegroup.com/confluence/display/EPICSANDBOX/Order+Functionalities#OrderFunctionalities-OrderAggressorIndicator
+
+* Descriptions
+
+** Terminology
+
+*** Aggressor orders
+
+Because a incoming bid has to be matched against existing offers and
+an incoming offer has to be matched against existing bids, we use the
+term: aggressor order for the incoming bid (or offer).
+
+Multiple aggressor orders can be incoming in one batch.
+
+
+** Algorithms
+
+*** Pro-rata
+
+
+
+Price, quantity, time 
+
+*** LMM Lead Market Maker
+
+Some parties are given a priority and a fulfilment percentage - how of
+an order may be filled by priority.
+
+After the LMM allocation is made, then FIFO is used.
+
+*** FIFO
+
+Time-based: first in, first out
+
+e-mini S&P 500 futures
+Brent Oil futures
+Cocoa futures
+
+Resting quotes are those remaining, they now lose some time priority.
+
+All orders at the same price level are filled according to time
+priority; the first order at a price level is the first order matched.
+
+By policy1, we choose to satisfy the highest bids first.
+Note: the alternative is to process earliest (oldest) bids
+
+By policy2, we choose to satisfy the lowest offer bids first.
+Note: the alternative is to process earliest (oldest) bids
+
+Find the highest bid (policy1)
+find all the offers at or below.
+allocate those offers, so that the lowest priced offers are allocated first (policy2)
+
+For each fully allocated offer, issue a fill
+For each fully allocated bid, issue a fill
+
+For each partly allocated bid, issue a partial-fill
+For each partly allocated offer, issue a partial-fill
+
+// aggressor orders - CMEGroup NASDAQ
+// https://www.cmegroup.com/confluence/display/EPICSANDBOX/Order+Functionalities#OrderFunctionalities-OrderAggressorIndicator
+
+// FIFO
+//  all orders at the same price level are filled according to time priority; the first order at a price level is the first order matched.
+
+// By policy1, we choose to satisfy the highest bids first.
+// Note: the alternative is to process earliest (oldest) bids
+
+// By policy2, we choose to satisfy the lowest offer bids first.
+// Note: the alternative is to process earliest (oldest) bids
+
+// Find the highest bid (policy1)
+// find all the offers at or below.
+// allocate those offers, so that the lowest priced offers are allocated first (policy2)
+//
+// For each fully allocated offer, issue a fill
+// For each fully allocated bid, issue a fill
+
+// For each partly allocated bid, issue a partial-fill
+// For each partly allocated offer, issue a partial-fill

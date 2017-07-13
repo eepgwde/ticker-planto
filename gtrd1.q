@@ -6,6 +6,16 @@
 // Stores bids and asks. Marries them up and generates trades. 
 //
 
+.t.ticks: 10
+
+.z.ts: ::
+
+// Write some data out after so many ticks and finish
+
+syn0: { [ts] .t.ticks-:1; if[.t.ticks > 0; : ::];
+       0N!"finished"; `:./t set get `.t;
+       .z.ts: ::; .sys.exit[0] }
+
 upd1:{ [t;x]
       x: update id0:.t.id0, tid:.t.idx+i from x;
       .t.idx+:count x;
@@ -17,6 +27,20 @@ upd1:{ [t;x]
 
 // Using converge to solve for a root using Newton's method.
 // {[xn] xn-((xn*xn)-2)%2*xn}/[1.5]
+
+\
+
+
+`.t set get `:./t
+
+.t.offers: select `.t.a$atid by sym, ask from .t.a
+
+.t.bids: select `.t.b$btid by sym, ask:bid from .t.b
+
+// It's possible to match on the key.
+
+(key .t.bids)#.t.offers
+
 
 \
 
@@ -167,3 +191,13 @@ deltas each deltas sums[sells] &\: sums[buys]
 // 0 1 3 0 0 0
 // 0 0 1 2 0 0
 // 0 0 0 1 1 0
+
+
+/  Local Variables: 
+/  mode:q 
+/  q-prog-args: "-p 5019 "
+/  fill-column: 75
+/  comment-column:50
+/  comment-start: "//  "
+/  comment-end: ""
+/  End:
