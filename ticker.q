@@ -57,19 +57,51 @@ pub1:{[t;b] s:raze b[0]; h:b[1];
 
 /// The feed send timespans, these are converted to datetimestamps from an offset.
 
+.t.x:()
+
+.tick.tstart: `timespan$0N
+
+/// After initialization by .u.udp0, pass timespan, adjust to zero.
+.u.upd2:{[t;x]
+	 .t.x: x;
+	 x[0;]: x[0;] - .tick.tstart;
+	 .u.upd1[t; x]; }
+
+/// Initialize and replace with .u.upd2
+.u.upd0: { [t;x] .t.x:x; .tick.tstart: max x[0;]; .u.upd: .u.upd2; .u.upd2[t;x]; }
+
+.u.upd: .u.upd0
+
+/
+
+/// After initialization, pass the timespan, no trace.
+.u.upd:{[t;x]
+	.u.upd1[t; x]; }
+
+\
+
+
+/
+
+// Note: this is a multi-line commment out
+
 /// We start at 9am on this date.
 .tick.tstart: 2017.07.14D09:00:00.0
 
-.t.x:()
-/// After initialization, time marks are added.
+// Use this if you want to use sym.q as time.
+
 .u.upd:{[t;x]
 	.t.x: x;
 	ts: `time$.tick.tstart + x[0;];		  /  change to time
 	.u.upd1[t; (enlist ts),x[1_til count x[;0];] ]; }
 
+// Remember, you must enlist the new row.
 // m:enlist(count x 0)#.z.T;
 //      .u.upd1[t;m,x] }
 
+// end: multi-line comment
+
+\
 
 /// Table and publishing
 

@@ -125,24 +125,31 @@ q:{
 feed0: { [] sw:rand 2;
 	t0: $[sw;t 1+rand maxn; q 1+rand qpt*maxn];
 	t1: $[sw; `trade; `quote];
-	a:count t0[0;]; t0[0;]: xidu a; (t1; t0) }
+	a:count t0[0;]; t0[0;]: xidu a; 
+	(t1; t0) }
 
 // Call add a sequence number and push.
 feed:{ [ts] x0: feed0[];
-       nx010: count x0[1][0;];
-       h(".u.upd"; x0[0]; (enlist nx010#`timespan$ts),x0[1] ); }
+      nx010: count x0[1][0;];
+      ts1: (enlist asc nx010#`timespan$ts);
+      h(".u.upd"; x0[0]; ts1,x0[1] ); }
+
+.feed.mins0:60
+
+.feed.tickrate: 1 % (value "\\t") % 1000
+.feed.ticks0: .feed.mins0 * 60 * .feed.tickrate
 
 /// Initialize with some timestamped records
 /// o is the time origin. Time now less an hour.
-/// d is then the timespan
-/// len is the length of list to submit. n is the last entries.
-/// Randomly generate 'len' timespans, take the last n.
+/// d is then delta between then and now
+/// len is the total number of ticks in the period.
+/// The batch size is n
 /// Submit.
 init0:{ [len;n]
-       o:`time$.z.T - `timespan$60*60*1000*1000*1000;
-       d:`timespan$.z.T-o;
-       len: $[null len; floor d%113; len];
-       feed each (neg n) # `timespan$desc len?d; }
+       o:.z.N - `timespan$.feed.mins0*60*1000*1000*1000;
+       d:`timespan$.z.N - o;
+       len: $[null len | len <= 0; floor .feed.ticks0; len];
+       feed each n cut asc o + (floor n*len)?d; }
 
 /// init: init0[10]
 init: init0[;5]
@@ -165,7 +172,7 @@ h:neg hopen `::5010
 // feed[]
 
 /// Initial send N batches of trades using past time-marks.
-init[10]
+init[maxn]
 
 /// Now set up the timer delivery, no time-marks are added by this.
 
