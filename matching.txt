@@ -1,8 +1,8 @@
-*
-
 * Source: CMEGroup NASDAQ
 
 https://www.cmegroup.com/confluence/display/EPICSANDBOX/Order+Functionalities#OrderFunctionalities-OrderAggressorIndicator
+
+Precis: walter.d.eaves@gmail.com
 
 * Descriptions
 
@@ -16,69 +16,155 @@ term: aggressor order for the incoming bid (or offer).
 
 Multiple aggressor orders can be incoming in one batch.
 
+A bid or an ask can then be called an order.
 
-** Algorithms
+A set of orders that satisfy an aggressor order is called the
+satisfying orders.
 
-*** Pro-rata
+The resting quantity is the amount remaining in the satisfying orders.
 
+These satisfying orders are ranked by some prioritization mechanism
+and then allocated to the aggressor order.
 
+The aggressor order may be partially-filled. The satisfying orders may
+be partially-filled. The portion that is allocated is known as a lot
+aand are formally the lots of the aggressor and satisfying orders.
 
-Price, quantity, time 
+The satisfying orders that are not allocated, or any part thereof, are
+then known as the unallocated satisfying orders - or the unallocated
+orders or unallocated lots.
 
-*** LMM Lead Market Maker
+These then form a new, reduced, resting quantity known as the new
+resting quantity. These remainders are then known as the resting
+orders.
 
-Some parties are given a priority and a fulfilment percentage - how of
-an order may be filled by priority.
-
-After the LMM allocation is made, then FIFO is used.
+** Matching Algorithms
 
 *** FIFO
 
 Time-based: first in, first out
 
 e-mini S&P 500 futures
-Brent Oil futures
-Cocoa futures
+Brent Oil and Cocoa futures
 
-Resting quotes are those remaining, they now lose some time priority.
+The aggressor order is used to form the satisfying set.
 
-All orders at the same price level are filled according to time
-priority; the first order at a price level is the first order matched.
+These are then ranked against time; the most recent is then allocated
+first to the full amount.
 
-By policy1, we choose to satisfy the highest bids first.
-Note: the alternative is to process earliest (oldest) bids
+Note: the new resting orders will increase in time-priority when new
+orders arrive.
 
-By policy2, we choose to satisfy the lowest offer bids first.
-Note: the alternative is to process earliest (oldest) bids
+*** Pro-rata methods
 
-Find the highest bid (policy1)
-find all the offers at or below.
-allocate those offers, so that the lowest priced offers are allocated first (policy2)
+Price, quantity, time and priority can all be used.
 
-For each fully allocated offer, issue a fill
-For each fully allocated bid, issue a fill
+Essentially, a percentage is taken from each.
 
-For each partly allocated bid, issue a partial-fill
-For each partly allocated offer, issue a partial-fill
+**** Pro-rata
 
-// aggressor orders - CMEGroup NASDAQ
-// https://www.cmegroup.com/confluence/display/EPICSANDBOX/Order+Functionalities#OrderFunctionalities-OrderAggressorIndicator
+e-mini JPY/USD futures, NZD/USD and AUD/USD futures
 
-// FIFO
-//  all orders at the same price level are filled according to time priority; the first order at a price level is the first order matched.
+Find the satisfying orders. No need to rank them. Find the percentage
+each takes of the total and allocate that proportion as a lot against the
+aggressor order, rounding down the lot size where necessary.
 
-// By policy1, we choose to satisfy the highest bids first.
-// Note: the alternative is to process earliest (oldest) bids
+This can lead to very small quantities in the partially-fulfilled
+unallocated lots, so 
 
-// By policy2, we choose to satisfy the lowest offer bids first.
-// Note: the alternative is to process earliest (oldest) bids
+it can be decided that should any satisfying order fall below 2 lots,
+it is not allocated and becomes a single lot.
 
-// Find the highest bid (policy1)
-// find all the offers at or below.
-// allocate those offers, so that the lowest priced offers are allocated first (policy2)
-//
-// For each fully allocated offer, issue a fill
-// For each fully allocated bid, issue a fill
+Because of this, an aggressor order may not be fulfilled. If there is
+a resting quantity, that is then allocated FIFO.
 
-// For each partly allocated bid, issue a partial-fill
-// For each partly allocated offer, issue a partial-fill
+In this way, the single lots should eventually be allocated.
+
+*** Pro-rata with Top Order
+
+This operates in the same way as Pro-rata, but has a preliminary
+prioritization of the satisfying orders, so that one of them is
+designated the Top Order and it will always be fulfilled.
+
+After the first Top Order is allocated, the pro-rata mechanism is
+applied to the remaining satisfying orders.
+
+Should there be any unallocated amount remaining after this, then a
+new Top Order is designated and the process begins again.
+
+*** LMM Lead Market Maker
+
+Some parties are given a priority and a fulfilment percentage - how of
+an order may be filled by priority.
+
+After the LMM allocation is made, then a FIFO one carried out.
+
+*** Split FIFO and Pro-Rata
+
+Corn futures
+
+A FIFO is applied first to a pre-defined percentage of the aggressor
+order's quantity.
+
+After that, a Pro-Rata mechanism is used, any lots smaller than one
+are rounded down to zero. 
+
+A levelling FIFO allocation may be performed afterwards. A new resting
+quantity is calculated from the orders of those parties that did not
+qualify for Pro-Rata, ie. those less than zero.
+
+These are then allocated Pro-Rata against the remainder of the
+aggressor order.
+
+**** Variants: Top-Order and LMM
+
+This can extend the algorithm.
+
+*** Threshold Pro-Rata
+
+Corn options
+
+A Top-Order is allocated to a threshold percentage and a resting order must
+meet the minimum level.
+
+**** Threshold Pro-Rata with LMM
+
+10y US Treasury Note Option
+
+The Top-Order has priority over any LMM. After that, a Pro-Rata method
+is used on any unallocated quantity in the aggressor order against the
+new resting quantity.
+
+*** Allocation
+
+Eurodollar futures
+EuroYen TIBOR futures
+3y Eurodollar Bundle futures
+
+Top-Order percentage
+Pro-Rata, 2 lot minimum
+FIFO any remaining
+
+** Trade Algorithms
+
+As a result of matching, a single aggressor order may produce multiple
+trades, subsequent cancellation or updates of orders.
+
+A single trade is posted for each aggressor order. A single update or
+cancellation is posted for each allocated order.
+
+* Postamble
+
+** This file's Emacs file variables
+
+[  Local Variables: ]
+[  mode:text ]
+[  mode:outline-minor ]
+[  mode:auto-fill ]
+[  fill-column: 75 ]
+[  coding: iso-8859-1-unix ]
+[  comment-column:50 ]
+[  comment-start: "[  "  ]
+[  comment-end:"]" ]
+[  End: ]
+

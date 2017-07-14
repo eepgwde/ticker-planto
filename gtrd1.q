@@ -30,6 +30,7 @@ upd1:{ [t;x]
 
 \
 
+// Load a sample file.
 
 `.t set get `:./t
 
@@ -41,6 +42,9 @@ upd1:{ [t;x]
 
 (key .t.bids)#.t.offers
 
+# Choose one batch
+.t.batch0: 7
+.t.batch: select from .t.a where id0 = 7
 
 \
 
