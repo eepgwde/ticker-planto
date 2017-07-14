@@ -1,5 +1,7 @@
-/ cx.q
-/ example clients
+/// cx.q
+/// example clients
+///
+/// Try not to define tables.
 
 x:.z.x 0                  / client type
 
@@ -12,7 +14,8 @@ if[ count .z.x 1; s:d]
 t:`trade`quote            / default tables
 h:hopen `::5010           / connect to tickerplant
 
-/ rdb
+/// rdb
+/// No knowledge of the underlying tables.
 if[x~"rdb";
  upd:insert]
 

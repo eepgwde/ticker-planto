@@ -45,40 +45,31 @@ pub1:{[t;b] s:raze b[0]; h:b[1];
 // The test function is h(".u.upd";`quote;q 1)
 // Sends a payload that is table name, t, and a tuple of a record
 // A single quote (1)
-// (,`MSFT;,28.59;,29.06;,35;,73;,\"L\";,\"N\")
+// (,1,`MSFT;,28.59;,29.06;,35;,73;,\"L\";,\"N\")
 // A single trade
 // "`trade"
-// "(,`HPQ;,36.04;,45i;,0b;,\"B\";,\"O\")"
+// "(,2,`HPQ;,36.04;,45i;,0b;,\"B\";,\"O\")"
 // Multiple records can be sent q 2 gives
-// "(`DELL`AIG;11.62 26.55;12.97 27.4;37 81;23 26;\"HH\";\"NO\")"
+// "(3 4;`DELL`AIG;11.62 26.55;12.97 27.4;37 81;23 26;\"HH\";\"NO\")"
 // A time mark is created, m, one for each symbol.
 // The local implementation is .u.upd1 which inserts to the table
 // publishes and empties the table.
-// The time mark is prepended to the list
 
-/// On initialization, time offsets are sent.
+/// The feed send timespans, these are converted to datetimestamps from an offset.
 
-// Over-ridden: traced
-.u.updm:{[t;x]
-	0N!.Q.s1 t; 0N!.Q.s1 x; 0N!count x;
-	.t.x:x;
-	m:enlist(count x 0)#.z.T;
-	.t.m:m;
-	 0N!"m: ",.Q.s1 m;
-	 x[0]:`time$(raze m) - x[0];
-	.u.upd1[t;x] }
+/// We start at 9am on this date.
+.tick.tstart: 2017.07.14D09:00:00.0
 
-// Final
-.u.updm: {[t;x]
-	  m:enlist(count x 0)#.z.T;
-	  x[0]:`time$(raze m) - x[0];
-	  .u.upd1[t;x]; }
-
-
+.t.x:()
 /// After initialization, time marks are added.
 .u.upd:{[t;x]
-	m:enlist(count x 0)#.z.T;
-	.u.upd1[t;m,x] }
+	.t.x: x;
+	ts: `time$.tick.tstart + x[0;];		  /  change to time
+	.u.upd1[t; (enlist ts),x[1_til count x[;0];] ]; }
+
+// m:enlist(count x 0)#.z.T;
+//      .u.upd1[t;m,x] }
+
 
 /// Table and publishing
 
@@ -88,12 +79,11 @@ pub1:{[t;b] s:raze b[0]; h:b[1];
 	 pub t;
 	 delete from t }
 
-
-\
-
 // To just trace the .u.upd1 operation, you change its definition you override in
 // the following file. You can only load these with the qsys q invokers Qp or Qr.
 // (So only in emacs.)
+
+\
 
 .sys.qreloader enlist "u-upd1.q"
 

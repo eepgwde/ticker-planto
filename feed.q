@@ -94,6 +94,13 @@ qpt:5   / avg quotes per trade
 
 // =========================================================
 
+
+// Exchange id - tag each order and trade.
+
+.ex.xid: 1
+
+xidu: { [n] x: .ex.xid + til n; .ex.xid: 1 + max x; x }
+
 // Generate a set of trades.
 //
 // A useful test is: flip t 10
@@ -102,7 +109,7 @@ t:{
  if[not (qn+x)<count qx;batch len];
    i:qx qn+til x;qn+:x;
    i: i where not null s i; n:count s i;
-   (s i;p2 i;`int$n?99;1=n?20;n?c;e i)}
+   (n#0N; s i;p2 i;`int$n?99;1=n?20;n?c;e i)}
 
 // see feed0.q
 // split bid from quote and randomly choose a subset.
@@ -110,19 +117,20 @@ q:{
  if[not (qn+x)<count qx;batch len];
    i:qx qn+til x; qn+:x;
    i: i where not null s i; n:count s i;
-   ba: (flip (s i;p2[i]*1f-qb[i];9h$n#0N;vol n;7h$n#0N;n?m;e i)),flip (s i;9h$n#0N;p2[i]*1+qa[i];7h$n#0N;vol n;n?m;e i);
+   ba: (flip (n#0N; s i;p2[i]*1f-qb[i];9h$n#0N;vol n;7h$n#0N;n?m;e i)),flip (n#0N; s i;9h$n#0N;p2[i]*1+qa[i];7h$n#0N;vol n;n?m;e i);
    n0: count ba;
    flip ba n?n0 }
 
-feed:{h$[rand 2;
- (".u.upd";`trade;t 1+rand maxn);
- (".u.upd";`quote;q 1+rand qpt*maxn)];}
+// Add a sequence number
+feed0: { [] sw:rand 2;
+	t0: $[sw;t 1+rand maxn; q 1+rand qpt*maxn];
+	t1: $[sw; `trade; `quote];
+	a:count t0[0;]; t0[0;]: xidu a; (t1; t0) }
 
-feedm:{ sw:rand 2;
-       t0: $[sw; t 1+rand maxn; q 1+rand qpt*maxn];
-       a:count t0[0;];
-       h(".u.updm"; $[sw; `trade; `quote]; (enlist a#x),t0 ); }
-
+// Call add a sequence number and push.
+feed:{ [ts] x0: feed0[];
+       nx010: count x0[1][0;];
+       h(".u.upd"; x0[0]; (enlist nx010#`timespan$ts),x0[1] ); }
 
 /// Initialize with some timestamped records
 /// o is the time origin. Time now less an hour.
@@ -134,7 +142,7 @@ init0:{ [len;n]
        o:`time$.z.T - `timespan$60*60*1000*1000*1000;
        d:`timespan$.z.T-o;
        len: $[null len; floor d%113; len];
-       feedm each (neg n) # `timespan$desc len?d; }
+       feed each (neg n) # `timespan$desc len?d; }
 
 /// init: init0[10]
 init: init0[;5]
@@ -144,7 +152,7 @@ init: init0[;5]
 // init[10]
 
 // weaves: disable here for debug
-\
+// \
 /// Connect and send
    
 h:neg hopen `::5010
@@ -156,7 +164,7 @@ h:neg hopen `::5010
 // Test feed with this
 // feed[]
 
-/// Initial data uses feedm that uses .u.updm to send time-marks.
+/// Initial send N batches of trades using past time-marks.
 init[10]
 
 /// Now set up the timer delivery, no time-marks are added by this.

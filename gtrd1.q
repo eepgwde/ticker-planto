@@ -46,6 +46,8 @@ upd1:{ [t;x]
 .t.batch0: 7
 .t.batch: select from .t.a where id0 = 7
 
+syn0: { [x] show (type x; x) }
+
 \
 
 // Allocations example
