@@ -67,19 +67,18 @@ If you want to debug the feed.q then
 
 * Changes
 
-** ticker.q and feed.q - init feedm and .u.updm
+** ticker.q and feed.q - timespans
 
-I've added a .u.updm method to the ticker.q process. It is used by the feed
-to initialize the system.
-
-You can also use this replay a lot of data at once, asynchronously, ie. not
-in real-time.
+The basic time unit is now the timespan. The sym.q needn't be used to
+define schema for the clients in cx.q. 
 
 ** feed.q - back-loading
 
 The feed process now generates some sample ticks over the last hour and
 replays all those to the ticker plant, (using a special method on the feed,
-feedm, which calls .u.updm on the ticker plant.)
+init[]).
+
+It also adds a sequence number - guaranteed to be in time order.
 
 After that, it begins to replay in real-time, using feed, assigned to
 synchronous method .z.ts, and the .u.upd method.
@@ -88,6 +87,11 @@ synchronous method .z.ts, and the .u.upd method.
 
 I had to pick apart the price generation logic and implement my own.
 feed0.q is a simple script for debugging.
+
+** ticker.q
+
+This can support a variety of time-stamps. Currently, it zero-bases a
+timespan.
 
 * Examples
 
