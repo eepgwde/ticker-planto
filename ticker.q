@@ -59,27 +59,10 @@ pub1:{[t;b] s:raze b[0]; h:b[1];
 
 .t.x:()
 
-.tick.tstart: `timespan$0N
 
-/// After initialization by .u.udp0, pass timespan, adjust to zero.
-.u.upd2:{[t;x]
-	 .t.x: x;
-	 x[0;]: x[0;] - .tick.tstart;
-	 .u.upd1[t; x]; }
-
-/// Initialize and replace with .u.upd2
-.u.upd0: { [t;x] .t.x:x; .tick.tstart: max x[0;]; .u.upd: .u.upd2; .u.upd2[t;x]; }
-
-.u.upd: .u.upd0
-
-/
-
-/// After initialization, pass the timespan, no trace.
 .u.upd:{[t;x]
+	.t.x: x;
 	.u.upd1[t; x]; }
-
-\
-
 
 /
 

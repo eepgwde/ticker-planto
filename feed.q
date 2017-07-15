@@ -131,7 +131,7 @@ feed0: { [] sw:rand 2;
 // Call add a sequence number and push.
 feed:{ [ts] x0: feed0[];
       nx010: count x0[1][0;];
-      ts1: (enlist asc nx010#`timespan$ts);
+      ts1: (enlist asc nx010#`timespan$ts - .feed.start0);
       h(".u.upd"; x0[0]; ts1,x0[1] ); }
 
 .feed.mins0:60
@@ -146,10 +146,12 @@ feed:{ [ts] x0: feed0[];
 /// The batch size is n
 /// Submit.
 init0:{ [len;n]
-       o:.z.N - `timespan$.feed.mins0*60*1000*1000*1000;
-       d:`timespan$.z.N - o;
        len: $[null len | len <= 0; floor .feed.ticks0; len];
-       feed each n cut asc o + (floor n*len)?d; }
+       feed each n cut asc .feed.start0 + (floor n*len)?.feed.d; }
+
+.feed.start: .z.p
+.feed.start0: .feed.start - `timespan$.feed.mins0*60*1000*1000*1000
+.feed.d:.feed.start - .feed.start0
 
 /// init: init0[10]
 init: init0[;5]
@@ -175,6 +177,8 @@ h:neg hopen `::5010
 init[maxn]
 
 /// Now set up the timer delivery, no time-marks are added by this.
+
+\
 
 .z.ts:feed
 
