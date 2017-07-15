@@ -6,6 +6,14 @@
 // Stores bids and asks. Marries them up and generates trades. 
 //
 
+\l sym.q
+
+\l extra0.q
+
+// Load the feed timing data.
+
+`.feed set get `:./feed;
+
 .t.ticks: 10
 
 .z.ts: ::
@@ -16,23 +24,87 @@ syn0: { [ts] .t.ticks-:1; if[.t.ticks > 0; : ::];
        0N!"finished"; `:./t set get `.t;
        .z.ts: ::; .sys.exit[0] }
 
-upd1:{ [t;x]
-      x: update id0:.t.id0, tid:.t.idx+i from x;
-      .t.idx+:count x;
-      .t.id0+:1;
-      .t.x:x;
-      .t.a,:select by atid from delete bid, bsize from update atime:time, atid:tid from select from x where not null ask ; 
-      .t.b,:select by btid from delete ask, asize from update btime:time, btid:tid from select from x where not null bid ; 
-      : :: }
+/// Immediately trade.
+im0: { [x]
+      h(".u.upd"; x0[0]; ts1,x0[1] ); }
 
-// Using converge to solve for a root using Newton's method.
-// {[xn] xn-((xn*xn)-2)%2*xn}/[1.5]
+upd1:{ [t;x]
+      .t.x:x;
+      `.t.batch insert x;
+      `.t.quotes upsert `xid xkey .t.batch;
+      delete from `.t.batch; }
+
+/// Convert a quote into a trade record.
+q2t: { [q0] q0: (0!q0);
+      px: (q0[`bid][0] ; q0[`ask][0]);
+      px: (px where not null px)[0];
+      size0: (q0[`bsize][0] ; q0[`asize][0]);
+      size0: (size0 where not null size0)[0];
+      (0N; q0[`sym][0]; px; size0; 0b; "A"; q0[`ex][0]) }
+
+/// Cancel a quote
+q2q: { [q0] q0: (0!q0);
+      px: (q0[`bid][0] ; q0[`ask][0]);
+      px: (px where not null px)[0];
+      size0: (q0[`bsize][0] ; q0[`asize][0]);
+      size0: (size0 where not null size0)[0];
+      // seq, sym, bid, ask, bsize, asize, mode, ex
+      (q0[`xid][0]; q0[`sym][0]; q0[`bid][0]; q0[`ask][0]; q0[`bsize][0]; q0[`asize][0]; q0[`mode][0]; q0[`ex][0]) }
+
+
+/// For trades, Add a sequence number
+feed0: { [tr1; tr0] 
+	a:count tr0[0;]; tr0[0;]: .ex.xidu a; 
+	(tr1; tr0) }
+
+// Send to ticker-plant.
+// ts is a .z.p timestamp and order/trade
+feed:{ [ts; x0] nx010: count x0[1][0;];
+      ts1: (enlist asc nx010#`timespan$ts - .feed.start0);
+      h(".u.upd"; x0[0]; ts1,x0[1] ); }
 
 \
 
-// Load a sample file.
+// Load some sample data.
+// And test completion by sending a trade and a completed quote.
 
 `.t set get `:./t
+
+// Test a trade
+
+q0: 1#.t.quotes
+
+t1: q2t[q0]
+t1: flip enlist t1
+
+feed0[`trade;t1]
+
+h:neg hopen `::5010
+
+feed[.z.p; feed0[`trade; t1]]
+
+feed[.z.p; (`quote;q2q[q0])]
+
+\
+
+while[ 0 < count .t.quote; .t.order: 1#.t.quote;
+      .t.quote: 1_.t.quote ]
+
+.ask.r0: () 
+.bid.r0: ()
+
+// Recreate the batches
+
+.ask.b0: select atid by time from .t.a
+.bid.b0: select btid by time from .t.b
+
+.ask.b1: 1#.ask.b0
+.ask.b0: 1_.ask.b0
+
+.bid.b1: 1#.bid.b0
+.bid.b0: 1_.bid.b0
+
+
 
 .t.offers: select `.t.a$atid by sym, ask from .t.a
 

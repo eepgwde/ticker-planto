@@ -15,9 +15,10 @@ t:`trade`quote            / default tables
 h:hopen `::5010           / connect to tickerplant
 
 /// rdb
-/// No knowledge of the underlying tables.
+/// No knowledge of the schema of the underlying tables.
 if[x~"rdb";
- upd:insert]
+   upd:insert]
+
 
 / high low close volume
 if[x~"hlcv";

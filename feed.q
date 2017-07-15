@@ -94,12 +94,8 @@ qpt:5   / avg quotes per trade
 
 // =========================================================
 
-
-// Exchange id - tag each order and trade.
-
-.ex.xid: 1
-
-xidu: { [n] x: .ex.xid + til n; .ex.xid: 1 + max x; x }
+// Provides .ex.xidu
+\l extra0.q
 
 // Generate a set of trades.
 //
@@ -111,6 +107,7 @@ t:{
    i: i where not null s i; n:count s i;
    (n#0N; s i;p2 i;`int$n?99;1=n?20;n?c;e i)}
 
+// Generate a set of quotes.
 // see feed0.q
 // split bid from quote and randomly choose a subset.
 q:{
@@ -122,14 +119,16 @@ q:{
    flip ba n?n0 }
 
 // Add a sequence number
-feed0: { [] sw:rand 2;
-	t0: $[sw;t 1+rand maxn; q 1+rand qpt*maxn];
+// Switch on sw
+feed0: { [sw] t0: $[sw;t 1+rand maxn; q 1+rand qpt*maxn];
 	t1: $[sw; `trade; `quote];
-	a:count t0[0;]; t0[0;]: xidu a; 
+	a:count t0[0;]; t0[0;]: .ex.xidu a; 
 	(t1; t0) }
 
 // Call add a sequence number and push.
-feed:{ [ts] x0: feed0[];
+// pass rand 2 to feed0 for trades and quotes
+// pass 0 for only quotes
+feed:{ [ts] x0: feed0[0];
       nx010: count x0[1][0;];
       ts1: (enlist asc nx010#`timespan$ts - .feed.start0);
       h(".u.upd"; x0[0]; ts1,x0[1] ); }
@@ -153,6 +152,10 @@ init0:{ [len;n]
 .feed.start0: .feed.start - `timespan$.feed.mins0*60*1000*1000*1000
 .feed.d:.feed.start - .feed.start0
 
+/// Write these parameters out.
+
+`:./feed set get `.feed;
+
 /// init: init0[10]
 init: init0[;5]
 
@@ -161,7 +164,6 @@ init: init0[;5]
 // init[10]
 
 // weaves: disable here for debug
-// \
 /// Connect and send
    
 h:neg hopen `::5010
@@ -177,8 +179,6 @@ h:neg hopen `::5010
 init[maxn]
 
 /// Now set up the timer delivery, no time-marks are added by this.
-
-\
 
 .z.ts:feed
 

@@ -48,5 +48,6 @@ case $1 in
  "tq" ) f $1 "$D/cx.q" "$1 -p 5016 -t 1000" ;;
  "vwap" ) f $1 "$D/cx.q" "$1 -p 5017 -t 1000" ;;
  "show" ) f $1 "$D/cx.q" $1 ;;
- "gtrd") f $1 "$D/gtrd.q" "-p 5019 -t 1000" ;;
+ # Matching engine
+ # "gtrd") f $1 "$D/gtrd.q" "-p 5019 -t 1000" ;;
 esac
