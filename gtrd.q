@@ -10,59 +10,25 @@
 x:.z.x 0                  / client type
 s:`;                   	  / default all symbols
 d:`GOOG`IBM`MSFT          / symbol selection
-d:s
+// d:s
 t:`quote                   / default tables
 
-.t.start: .z.n
+// Dummy method to start with.
+upd: { [t;x] : :: }
 
-\l sym.q
-
-// Split quotes table and add a transaction id.
-
-.t.a: delete bid, bsize from update atime:time, atid:xid from quote;
-.t.b: delete ask, asize from update btime:time, btid:xid from quote;
-
-.t.a: select by atid from .t.a;
-.t.b: select by btid from .t.b;
-
-.t.t:([] bid:`.t.a$(); ask:`.t.b$(); cond:`char$(); ex:`char$())
-
-.t.x:()
+h:hopen `::5010           / connect and subscribe to tickerplant
+{ h(".u.sub";x;d) } each t;
 
 .sys.qreloader enlist "gtrd1.q"
 
-.z.ts: syn0
+// Reconnect for the feed[] function
+h:neg hopen `::5010
 
+// Connect real methods.
+
+.z.ts: syn0
 upd: upd1
 
-h:hopen `::5010           / connect to tickerplant
-{ h(".u.sub";x;d) } each t;
-
-\
-
-upd: { [t;x] }
-
-aa: `tid xasc select from .t.a where sym in d
-ba: `tid xasc select from .t.b where sym in d
-
-x0:aj[`sym`tid; ba; aa]
-
-x0:delete from x0 where (null ask) or (null bid)
-
-x0: select from x0 where (bid >= ask),(btime >= atime)
-
-x0: value `sym`time`bid xasc x0
-
-b0: x0[0;]
-
-xb: ungroup select `.t.b$distinct btid by time,sym from x0
-xa: ungroup select `.t.a$distinct atid by time,sym from x0
-
-// Rules:
-// At bid time, find max bid, find all offers less than max bid, sum offered sizes
-// create trades at offered price, for amounts, lowest prices first.
-// If sum offered sizes >= bid size, then cancel bid and cancel offers.
-// 
 
 /  Local Variables: 
 /  mode:q 

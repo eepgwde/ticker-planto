@@ -24,14 +24,39 @@ syn0: { [ts] .t.ticks-:1; if[.t.ticks > 0; : ::];
        0N!"finished"; `:./t set get `.t;
        .z.ts: ::; .sys.exit[0] }
 
-/// Immediately trade.
-im0: { [x]
-      h(".u.upd"; x0[0]; ts1,x0[1] ); }
+
+/
+
+// Debug: a data collector
 
 upd1:{ [t;x]
       .t.x:x;
       `.t.batch insert x;
+      `.t.quotes upsert `xid xkey .t.batch; }
+
+\
+
+/// Do some matching and issue cancel quotes and trades.
+///
+/// Create a batch, upsert to a local quotes table indexed on xid.
+/// Delete from this table all those that are complete/cancelled, ie. "C" in mode.
+///
+/// Remove the cancels from the batch and check if empty.
+///
+/// Otherwise, resolve those aggressor orders and update the ticker-plant.
+/// Send cancellations/completions for the quotes using the prior xid index.
+/// Send trades with new xid indices.
+
+upd1:{ [t;x]
+      `.t.batch insert x;
       `.t.quotes upsert `xid xkey .t.batch;
+      delete from `.t.quotes where mode = "C";
+
+      t0: delete from .t.batch where mode = "C";
+      if[ 0 = count t0; : ::];
+      x0: resolve[t0];
+      feed[.z.p; (`quote;x0[0]) ];
+      feed[.z.p; feed0[`trade; x0[1]]];
       delete from `.t.batch; }
 
 /// Convert a quote into a trade record.
@@ -63,6 +88,17 @@ feed:{ [ts; x0] nx010: count x0[1][0;];
       ts1: (enlist asc nx010#`timespan$ts - .feed.start0);
       h(".u.upd"; x0[0]; ts1,x0[1] ); }
 
+
+resolve: { [tb]
+	  q1s:(); t1s:();
+	  while[ 0 < count tb; q0:1#tb; tb: 1_tb;
+		tick0:.z.p;
+		t1: q2t[q0]; t1s,:enlist t1;
+		q1: update bid:0f, mode:"C" from q0 where not null bid;
+		q1: update ask:0f, mode:"C" from q1 where not null ask;
+		q1s,:enlist q2q[q1] ] ;
+	  (flip q1s; flip t1s) }
+
 \
 
 // Load some sample data.
@@ -79,16 +115,23 @@ t1: flip enlist t1
 
 feed0[`trade;t1]
 
+q1: update bid:0N, ask:0N, mode:"C" from q0;
+q1: flip enlist q2q[q1];
+
+upd: { [t;x] : :: }
 h:neg hopen `::5010
 
 feed[.z.p; feed0[`trade; t1]]
 
 feed[.z.p; (`quote;q2q[q0])]
 
-\
+x0: resolve[5#0!.t.quotes]
 
-while[ 0 < count .t.quote; .t.order: 1#.t.quote;
-      .t.quote: 1_.t.quote ]
+feed[.z.p; (`quote;x0[0]) ]
+
+feed[.z.p; feed0[`trade; x0[1]]]
+
+\
 
 .ask.r0: () 
 .bid.r0: ()
@@ -103,8 +146,6 @@ while[ 0 < count .t.quote; .t.order: 1#.t.quote;
 
 .bid.b1: 1#.bid.b0
 .bid.b0: 1_.bid.b0
-
-
 
 .t.offers: select `.t.a$atid by sym, ask from .t.a
 
