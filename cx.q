@@ -49,8 +49,11 @@ if[x~"tq";
   @[{tq,:x lj q};x;""];
   q,:select by sym from x]}]
 
+// something wrong with the ticker-plant
+// it calls VWAP with quote table data
+// so fixed it here
 if[x~"vwap";t:`trade;
- upd:{[t;x]vwap+:select size wsum price,sum size by sym from x};
+ upd:{[t;x] if[t <> `trade; : ::]; vwap+:select size wsum price,sum size by sym from x};
  upds:{[t;x]vwap+:select size wsum price,sum size by sym from x;show x}]
 
 {h(".u.sub";x;s)} each t;

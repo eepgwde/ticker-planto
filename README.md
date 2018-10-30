@@ -106,7 +106,10 @@ that you can't use this implementation in commercial use.
 
 ** Developing clients
 
-If you want to develop clients this will work well enough.
+If you want to develop clients against a ticker-plant this will work well
+enough.
+
+There are examples in demo/
 
 ** Coding in q
 

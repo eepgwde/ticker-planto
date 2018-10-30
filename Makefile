@@ -7,7 +7,8 @@ export D_NAME ?= run
 # ticker rdb tq hlcv last show feed
 # export D_Ss ?= ticker rdb last show feed
 
-export D_Ss ?= ticker rdb last tq gtrd show feed
+# VWAP is broken at ticker but fixed by its client
+export D_Ss ?= ticker rdb last hlcv vwap tq show feed
 
 check: $(D_NAME).log
 
