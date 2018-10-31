@@ -64,6 +64,17 @@ If you want to debug the feed.q then
 
  $ run.sh ticker last
 
+*** Services
+
+ rdb 5011
+ hlcv 5014
+ last 5015
+ tq 5016
+ vwap 5017
+
+ last1 5018
+ gtrd 5019
+
 
 * Changes
 
