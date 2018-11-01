@@ -1,7 +1,9 @@
 / cx.q
 / example clients
 
-x:.z.x 0                  / client type
+/ client type
+// when testing set x and load
+if[ not any `x = key `.; x:.z.x 0]
 
 s:`;                   	  / default all symbols
 d:`GOOG`IBM`MSFT          / symbol selection
@@ -49,14 +51,32 @@ if[x~"tq";
   @[{tq,:x lj q};x;""];
   q,:select by sym from x]}]
 
-// something wrong with the ticker-plant
-// it calls VWAP with quote table data
-// so fixed it here
-if[x~"vwap";t:`trade;
- upd:{[t;x] if[t <> `trade; : ::]; vwap+:select size wsum price,sum size by sym from x};
- upds:{[t;x]vwap+:select size wsum price,sum size by sym from x;show x}]
+// VWAPs
+if[any 0 = x ss "vwap"; t:`trade;
+   // over all trades
+   .vwap.f0: {[t;x] vwap+:select size wsum price,sum size by sym from x};
 
-{h(".u.sub";x;s)} each t;
+   // over last minute
+   .vwap.f1: {[t;x] vwap1+:select size wsum price,sum size by sym,time.minute from x};
+
+   // over last 10 ticks
+   .vwap.xf2:{[p;s](-10#s)wavg -10#p};
+   .vwap.f2:{[t;x] .[`.u.t;();,'';select price,size by sym from x]; 
+             vwap2::`sym xkey select sym,vwap2:.vwap.xf2'[price;size]from .u.t};
+
+   // over last minute
+   .vwap.xf3: {[t;p;s](n#s)wavg(n:(1+t bin("t"$.z.Z)-60000)-count t)#p};
+
+   .vwap.f3: {[t;x] .[`.u.t1;();,'';select time,price,size by sym from x];
+              vwap3::`sym xkey select sym,vwap3:.vwap.xf3'[time;price;size] from .u.t1};
+
+   fs: `$".vwap.",/: ( string 1_ key .vwap ) where { x[0] = "f" } each string 1_ key .vwap;
+   upd: { [t;x] { [f; t; x] f . (t;x) }[;t;x] peach fs };
+   upd: { [t;x] (fs).\:(t;x) }
+
+   ]
+
+{ h(".u.sub";x;s) } each t;
 
 /  Local Variables: 
 /  mode:q 
