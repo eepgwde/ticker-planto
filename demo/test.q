@@ -4,7 +4,8 @@
 // Map of ports and clients
 h: (`symbol$())!`int$()
 
-h[`rdb]:hopen `::5011           / connect to rdb
+// connect to rdb
+h[`rdb]:hopen `::5011           
 h[`hlcv]:hopen `::5014
 h[`last]:hopen `::5015
 h[`tq]:hopen `::5016
