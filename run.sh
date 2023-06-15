@@ -1,8 +1,8 @@
 #!/bin/bash
 # run rdb demo
 
-: ${d_services=$*}
-: ${d_services=ticker rdb hlcv last tq show vwap feed}
+: ${d_services:=$*}
+: ${d_services:=ticker rdb hlcv last tq show vwap feed}
 
 D=$(realpath $(dirname $0))
 export D

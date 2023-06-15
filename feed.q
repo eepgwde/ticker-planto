@@ -144,7 +144,7 @@ init: init0[;5]
 // init[10]
 
 // weaves: disable here for debug
-\
+
 /// Connect and send
    
 h:neg hopen `::5010
