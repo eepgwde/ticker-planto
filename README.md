@@ -88,6 +88,34 @@ synchronous method .z.ts, and the .u.upd method.
 I had to pick apart the price generation logic and implement my own.
 feed0.q is a simple script for debugging.
 
+These notes are for the batch[] function
+
+generate a batch of prices
+qx index, qb/qa margins, qp price, qn position.
+
+Makes use of alias :: to set globals.
+
+d is a set of deltas.
+
+n0 is a set of indicators for which deltas to use
+qx is a clever index randomize
+qx=/:til cnt returns indicators, 1 if the index is in qx. So for
+qx === 3 2 3 9 8 5 8 6 1 1
+n0 === null, 8 9, 1, 0 2, null , 5 , 7, null, 4 6, 3
+ie. no zeroes appear in qx, so the delta at position 0 is not selected.
+because 1 1 in qx at positions 8 and 9, then then deltas at positions 8 and 9 are chosen
+because 2 in qx at position 1, then the delta at pos 1 is chosen.
+
+d n0 is shorthand for d[n0]
+
+qp raze n - removes any nulls
+
+t[] uses an 'n' but it isn't clear what it is.
+
+There is a problem with this. p begins as the initial prices and is
+overwritten each time batch is called, but batch can introduce nulls.
+And, eventually, all the prices are assigned null and stay that way.
+
 ** ticker.q
 
 This can support a variety of time-stamps. Currently, it zero-bases a

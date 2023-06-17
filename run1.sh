@@ -3,7 +3,7 @@
 
 test -n "$sName" || exit 1
 
-Q=~/q/l32/q
+Q=~/q/l64/q
 : ${D=$(realpath $(dirname $0))}
 
 cd $D
